@@ -10,8 +10,8 @@ Rewrite every sentence by these rules:
 
 These sentence shapes read as model-written (found by rewriting the sentence tropa-mini weighed most, one at a time):
 7. No lead-in clause before the main point: do not open a sentence with "For extra X,", "To do X,", "If you're …,", "When …,". Say the point first; put the condition after it or in its own sentence.
-8. No balanced contrast pairs ("early … instead of late …", "A, but B", "rather than", "while"): say the side that matters, or make two sentences.
-9. No trailing explanation clauses (", since …", ", which …", ", helping to …", ", making …", ", so that …"): end the sentence and give the reason its own short sentence.
+8. No balanced constructions ("not X but Y", "not just X, Y", "rather than", "instead of", "early … instead of late …", a sentence that opens "While X, Y"): say the side that matters.
+9. No trailing "-ing" clause that comments on the sentence (", helping to …", ", making …", ", ensuring …", ", allowing …"): end the sentence, and give the result its own sentence or cut it.
 10. No hypothetical openers ("Say …", "Imagine …", "Picture …"): state the case directly.
 11. At most one question in the paragraph, and only for a claim that is genuinely debatable.
 12. No topic sentence: do not open the paragraph with a sentence that announces what it covers ("Decide how often backups run.", "Test your setup.", "There are several reasons to…"). Start with the first concrete step, fact or example; if the opening sentence carries an instruction the rest does not, fold it into the next sentence.
