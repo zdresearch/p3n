@@ -1,0 +1,9 @@
+# Only for running tropa-mini (AI Detection's classifier, Humanize's scorer) on your own machine. The pins are the
+# versions the hosted API measured it with; CPU is enough. Everything else in p3n needs no packages.
+torch==2.14.1
+transformers==5.19.0
+tokenizers==0.23.3
+sentencepiece==0.2.2
+protobuf==7.36.2
+safetensors==0.8.0
+huggingface_hub==2.2.0

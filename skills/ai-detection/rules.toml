@@ -1,0 +1,781 @@
+# AI Detection's linter rules. Each rule is a pattern that model-written text shows far more often than human text,
+# with points per hit; the scores were set by hand and tuned on a labelled corpus of human and model text.
+#
+# kind:
+#   phrase   case-insensitive phrase map, each phrase with its own score ([rules.phrases])
+#   regex    one or more patterns, `score` per hit
+#   check    a function in scripts/lint.py (segment-level structure: wrap, paragraphs, openers…)
+#   llm      needs reading: the reading subagent finds instances (reading.md, SKILL.md); `ask` is the definition it
+#            gets, `pairs` a scripted rule whose hits it must not count again. Scored with lint.py --reading.
+# score: points per hit. cap: max hits counted per segment (default 5). model: all | claude | chatgpt.
+# Goal: true positives. A rule that also fires on ordinary human text should be scored low or removed.
+
+[meta]
+segment_tokens = 760        # break segments at paragraph boundaries near this many tokens (tropa-mini's chunk)
+words_per_token = 0.75
+density_floor_words = 300   # density = points * 1000 / max(words, floor)
+k = 60                      # ai = density / (density + k); provisional, fitted on the corpus
+
+# ---------- A. Punctuation and layout ----------
+
+[[rule]]
+id = "unicode-dash"
+name = "Em/en dash and other non-keyboard dashes"
+kind = "regex"
+score = 10
+cap = 6
+model = "all"
+patterns = ['[—―‒−]', '(?<!\d)–|–(?!\d)']   # en dash in a number range (1990–95) is exempt
+
+[[rule]]
+id = "typed-dash"
+name = "Typed dash as punctuation (' - ', ' -- ')"
+kind = "regex"
+score = 1
+model = "all"
+patterns = ['(?<=[A-Za-z0-9,]) --? (?=[A-Za-z0-9])']
+
+[[rule]]
+id = "semicolon"
+name = "Semicolon"
+kind = "regex"
+score = 2
+model = "chatgpt"
+patterns = [';(?=\s)']
+
+[[rule]]
+id = "label-dash"
+name = "Dash after a list label"
+kind = "regex"
+score = 3
+model = "all"
+line = true
+patterns = ['^\s*[-*+]\s+(?:\*\*[^*]{1,60}\*\*|`[^`]{1,60}`|[A-Za-z_][\w.()]{0,40})\s+-\s+\S']
+
+[[rule]]
+id = "hard-wrap"
+name = "Prose hard-wrapped at a fixed column"
+kind = "check"
+check = "hard_wrap"
+score = 50
+cap = 1
+model = "all"
+
+[[rule]]
+id = "emoji"
+name = "Emoji furniture"
+kind = "regex"
+score = 10
+cap = 3
+model = "chatgpt"
+patterns = ['[✅❌✨⭐⚠✔✖➡]', '[\U0001F300-\U0001FAFF]']
+
+[[rule]]
+id = "bold-lead-bullets"
+name = "Bold-lead bullets (3+ in a segment)"
+kind = "check"
+check = "bold_lead_bullets"
+score = 5
+model = "all"
+
+[[rule]]
+id = "scaffold-heading"
+name = "Scaffold heading"
+kind = "regex"
+score = 2
+model = "all"
+line = true
+patterns = ['^#{1,6}\s*(?:Introduction|Overview|Background|Key (?:Takeaways|Points|Findings)|Conclusion|Summary|Final Thoughts|Next Steps|Best Practices)\s*$', '^#{1,6}\s*(?:Understanding|Exploring|Diving into|A Deep Dive)\b']
+
+[[rule]]
+id = "rhetorical-question"
+name = "Rhetorical question"
+kind = "check"
+check = "rhetorical_question"
+score = 2
+model = "all"
+
+# ---------- B. Vocabulary ----------
+
+[[rule]]
+id = "ai-filler"
+name = "AI filler words and phrases"
+kind = "phrase"
+model = "all"
+cap = 8
+[rule.phrases]
+"load-bearing" = 15
+"load bearing" = 15
+"delve" = 5
+"delves" = 5
+"delving" = 5
+"tapestry" = 5
+"realm of" = 3
+"let's unpack" = 5
+"navigate the complexities" = 5
+"in today's world" = 3
+"in today's fast-paced world" = 8
+"it's worth noting" = 4
+"it is worth noting" = 4
+"at its core" = 3
+"under the hood" = 3
+"source of truth" = 3
+"make no mistake" = 3
+"the reality is" = 2
+"first-class citizen" = 3
+"single pane of glass" = 3
+"synergy" = 3
+"game changer" = 3
+"game-changer" = 3
+"shed light" = 2
+"treasure trove" = 3
+"testament to" = 4
+"a beacon of" = 4
+"interplay" = 3
+"paramount" = 3
+"indelible" = 3
+"bespoke" = 2
+"cognizant" = 2
+"hitherto" = 2
+"daunting task" = 3
+"bustling" = 3
+"cutting-edge" = 2
+"unlock the potential" = 4
+"unlocks the potential" = 4
+"solid foundation" = 2
+"innovative solutions" = 3
+"drive efficiency" = 3
+"embark on" = 3
+"embarked on" = 3
+"foster" = 2
+"fosters" = 2
+"fostering" = 2
+"underscore" = 3
+"underscores" = 3
+"underscoring" = 3
+"streamline" = 2
+"streamlines" = 2
+"resonate with" = 3
+"resonates with" = 3
+"navigate the" = 2
+"navigating the" = 2
+"multifaceted" = 4
+"nuanced" = 2
+"intricate" = 2
+"pivotal" = 3
+"a myriad of" = 3
+"ever-evolving" = 4
+"ever-changing landscape" = 4
+"rich history" = 2
+"vibrant" = 2
+
+[[rule]]
+id = "byte-for-byte"
+name = "'byte for byte' emphasis"
+kind = "regex"
+score = 50
+model = "claude"
+patterns = ['\bbyte[- ](?:for|to)[- ]byte\b']
+
+[[rule]]
+id = "ai-idiom"
+name = "Odd technical idiom ('gives back' for returns)"
+kind = "regex"
+score = 15
+model = "claude"
+patterns = ['\bgives? back (?:a|an|the|its|their|it)\b(?! (?:community|society|world))']
+
+[[rule]]
+id = "promo-adjective"
+name = "Brochure adjective"
+kind = "regex"
+score = 1
+model = "all"
+patterns = ['\b(?:seamless(?:ly)?|vibrant|renowned|nestled|world-class|best-in-class|transformative|unparalleled|unmatched|revolutionary|immersive|effortless(?:ly)?|showcases?|supercharge[sd]?|game-changing)\b']
+
+[[rule]]
+id = "intensifier"
+name = "Empty intensifier"
+kind = "regex"
+score = 4
+model = "chatgpt"
+patterns = ['\b(?:genuinely|truly|remarkably|extremely|incredibly|vastly|dramatically|crucially)\b']
+
+[[rule]]
+id = "superlative"
+name = "Superlative as judgement"
+kind = "check"
+check = "superlative"
+score = 1
+cap = 2
+model = "all"
+
+[[rule]]
+id = "padding"
+name = "Bureaucratic padding"
+kind = "regex"
+score = 1
+model = "all"
+patterns = ['\b(?:at this point in time|begin the process of|in the event that|due to the fact that|for the purpose of|has the ability to|with regard to|it should be noted that|it is important to (?:note|understand|remember) that|please be advised)\b']
+
+[[rule]]
+id = "elevated-synonym"
+name = "Elevated synonym"
+kind = "regex"
+score = 2
+model = "all"
+patterns = ['\b(?:commence[sd]?|thereby|ascertain(?:ed)?|elucidate[sd]?|utili[sz]e[sd]?)\b']
+
+[[rule]]
+id = "wall-clock"
+name = "'wall clock' jargon"
+kind = "regex"
+score = 10
+model = "all"
+patterns = ['\bwall[- ]clock\b']
+
+[[rule]]
+id = "measurement-overuse"
+name = "'measurement' 4+ times in a segment"
+kind = "check"
+check = "measurement_overuse"
+score = 10
+cap = 1
+model = "all"
+
+[[rule]]
+id = "contract"
+name = "'contract' for a requirement"
+kind = "regex"
+score = 10
+model = "claude"
+patterns = ['\b(?:the|this|that|its|their|a) contract (?:the|that|it|says|states|requires|holds|is that|with the caller)\b(?! (?:was|were) (?:signed|awarded|worth))']
+
+[[rule]]
+id = "shell-noun"
+name = "Shell noun (shape, kind, form, facet)"
+kind = "regex"
+score = 5
+model = "claude"
+patterns = ['\b(?:the|a|an|this|that|each|every|same|its|their|which|what|one|two|three|any) shapes?\b(?! up)', '\bshapes? (?:of|that)\b', '\bfacets?\b', '\b(?:two|three|four|five|several|many|both|these|those|the) kinds\b', '\b(?:two|three|four|five|several|both|these|those) forms\b']
+
+[[rule]]
+# Leans formal text toward AI; capped at 2 points per segment so it never flags alone.
+id = "uncontracted-negation"
+name = "Uncontracted negation"
+kind = "regex"
+score = 0.5
+cap = 4
+model = "all"
+patterns = ['\b(?:does|do|is|are|was|were|has|have|did) not\b', '\bcannot\b']
+
+# ---------- C. Frames and constructions ----------
+
+[[rule]]
+id = "antithesis"
+name = "Antithesis ('not just X, but Y')"
+kind = "regex"
+score = 2
+model = "all"
+patterns = ['\bnot (?:just|only|merely) [^.!?]{2,40}?,? but\b', "\\bisn[’']?t just [^.!?]{2,40}?,? (?:it[’']?s|it is)\\b", "\\b(?:is|are)n[’']?t (?:a|an|the) [^.!?]{2,30}?, (?:it[’']?s|they[’']?re)\\b", '\bless about [^.!?]{2,30}? (?:and )?more about\b', '\bnot because [^.!?]{2,40}? but because\b', '\bmore than just\b']
+
+[[rule]]
+id = "staged-reveal"
+name = "Staged reveal"
+kind = "regex"
+score = 2
+model = "all"
+patterns = ['\b(?:turns|turned|turn) out (?:to be|that)\b', '\bit turn(?:s|ed) out\b', '\bprove[sd]? to be\b', '\brevealed itself\b', '\bit emerged that\b', '\bwhat makes (?:this|it) interesting\b', '\bthe interesting part is\b', "\\bhere[’']?s the (?:twist|kicker|catch)\\b", '\bthe twist is\b']
+
+[[rule]]
+id = "unmeasured-comparative"
+name = "Comparative with no number ('a bigger problem than')"
+kind = "check"
+check = "unmeasured_comparative"
+score = 5
+cap = 3
+model = "all"
+
+[[rule]]
+id = "cleft"
+name = "Cleft / backwards sentence"
+kind = "regex"
+score = 5
+model = "all"
+patterns = [',\s+and\s+[^.!?]{2,45}?\s+(?:is|are)\s+what\b', '(?:^|[.!?]\s+)\w+ing\b[^.!?]{0,45}?\s+(?:is|are)\s+(?:what|why)\b', '\bis where (?:this|that|the) [^.!?]{0,25}?(?:opens|begins|starts|lies)\b']
+
+[[rule]]
+id = "meta-announcement"
+name = "Meta-announcement"
+kind = "regex"
+score = 10
+model = "all"
+patterns = ['\b(?:below|here) (?:is|are) (?:a|an|the|your|my) (?:\w+ ){0,3}(?:rewrite|revision|version|summary|draft|breakdown|overview|analysis|guide|plan|response|answer|write-?up|explanation|essay|story|article)\b', '\btailored to your\b', '\b(?:i|we) (?:have )?(?:crafted|prepared|put together|drafted|assembled) (?:a|an|the)\b', '\bthis (?:document|memo|guide|section|report|essay|article) will (?:cover|explain|walk|discuss|outline|explore)\b', '\bbefore (?:we )?(?:get|getting) started\b', '\bwithout further ado\b', '\bhope this helps\b', '\blet me walk you through\b']
+
+[[rule]]
+id = "opening-warmup"
+name = "Opening warmup"
+kind = "check"
+check = "opening_warmup"
+score = 5
+cap = 1
+model = "all"
+
+[[rule]]
+id = "completeness-flourish"
+name = "Completeness flourish ('and nothing else')"
+kind = "regex"
+score = 10
+model = "all"
+patterns = ['\band nothing (?:else|more)\b', "\\band that(?: is|[’']s) all\\b"]
+
+[[rule]]
+id = "totality-claim"
+name = "Totality claim ('is the entire fix')"
+kind = "regex"
+score = 8
+model = "claude"
+patterns = ['\b(?:is|are|was) the (?:entire|whole|complete|only) (?:fix|reason|story|point|difference|problem|change|answer|cause)\b', '\bis all it takes\b']
+
+[[rule]]
+id = "never-frame"
+name = "'never' in an AI frame"
+kind = "regex"
+score = 3
+model = "all"
+patterns = ['\b(?:was|is|were|are) never (?:really |truly |just |simply )?about\b', '(?:^|[.!?]["”]?\s+)(?:It|That|I|She|He|They|We) never (?:was|were|did|would be|will|had|could)[.!]', ', never [a-z]+ing\b', '\b[a-z]+ but never [a-z]+\b']
+
+[[rule]]
+id = "stacked-hedge"
+name = "Stacked hedges"
+kind = "check"
+check = "stacked_hedge"
+score = 2
+model = "all"
+
+[[rule]]
+id = "tricolon"
+name = "Tricolon"
+kind = "regex"
+score = 2
+model = "all"
+patterns = ['\b(\w+ly), (\w+ly),? and (\w+ly)\b', '\b(?:is|are|was|were|be) (\w{4,}), (\w{4,}),? and (\w{4,})\b']
+
+[[rule]]
+id = "fragment"
+name = "Fragment for effect"
+kind = "check"
+check = "fragment"
+score = 5
+cap = 3
+model = "all"
+
+[[rule]]
+id = "participle-opener"
+name = "Participle fragment opener ('Reproduced verbatim')"
+kind = "regex"
+score = 5
+model = "all"
+patterns = ['(?:^|[.!?]\s+)(?:Reproduced|Confirmed|Verified|Tested|Measured|Checked|Observed|Validated|Rerun|Re-run) (?:verbatim|locally|again|twice|independently|end to end)\b']
+
+[[rule]]
+id = "poetic-negation"
+name = "Poetic negation"
+kind = "regex"
+score = 10
+model = "claude"
+patterns = ['\bnothing (?:but|more than|short of|other than)\b', '\banything but\b', '\blittle more than\b', '\bnone other than\b']
+
+[[rule]]
+id = "final-only"
+name = "Sentence-final 'only'"
+kind = "regex"
+score = 2
+model = "claude"
+patterns = ['\bonly[.!?](?=\s|$)']
+
+[[rule]]
+id = "double-negative"
+name = "Neither/nor and double negatives"
+kind = "regex"
+score = 5
+model = "all"
+patterns = ['\bneither\b[^.!?]{1,60}\bnor\b', '\bno \w+ and no \w+\b', '\bnot \w+ and not \w+\b']
+
+# dropped 2026-10-19 ("instead of"/"rather than" common in human prose): contrast-tail
+
+[[rule]]
+id = "contrastive-while"
+name = "Contrastive ', while' (2+ in a segment)"
+kind = "check"
+check = "contrastive_while"
+score = 2
+model = "all"
+
+[[rule]]
+id = "closed"
+name = "'closed' for handled/fixed/done"
+kind = "regex"
+score = 5
+model = "claude"
+patterns = ['\b(?:issue|finding|bug|gap|question|concern|problem|defect|item|point|loop|thread)s? (?:is|are|was|were|now|stays?|remains?) closed\b']
+
+# ---------- D. Sentence and paragraph structure ----------
+
+[[rule]]
+id = "so-join"
+name = "', so' chaining (2+ in a paragraph)"
+kind = "check"
+check = "so_join"
+score = 2
+model = "all"
+
+[[rule]]
+id = "long-sentence"
+name = "Long sentence (>40 words)"
+kind = "check"
+check = "long_sentence"
+score = 1
+cap = 2
+model = "all"
+
+# dropped 2026-10-19 (humans write longer paragraphs; ran backwards): wall-paragraph
+
+[[rule]]
+id = "same-opener"
+name = "Same-opener drone (3+ sentences, same first two words)"
+kind = "check"
+check = "same_opener"
+score = 10
+model = "all"
+
+# ---------- E. Pointers and reference ----------
+
+[[rule]]
+id = "unanchored-opener"
+name = "Paragraph opens on a bare pronoun ('This means…')"
+kind = "check"
+check = "unanchored_opener"
+score = 3
+cap = 3
+model = "claude"
+
+[[rule]]
+id = "bare-count"
+name = "Bare count as a noun ('all six')"
+kind = "regex"
+score = 4
+model = "claude"
+patterns = ['\b(?:all|the other|those|these) (?:two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|\d+)(?=[.,;:)]|\s+(?:are|were|have|had|do|did|share|pass|fail|need|use|run)\b)']
+
+[[rule]]
+id = "bare-quantifier"
+name = "Bare quantifier ('both register')"
+kind = "regex"
+score = 2
+model = "all"
+patterns = ['\b(?:each|either|neither) (?:is|was|has|does|will|would|can|could|should|must|may|might)\b']
+
+[[rule]]
+id = "one-substitute"
+name = "'one' as a noun ('the first one')"
+kind = "regex"
+score = 2
+model = "all"
+patterns = ['\bthe (?:first|second|third|last|next|other|latter|former) one\b']
+
+[[rule]]
+id = "bare-other"
+name = "Bare other/former/latter/rest"
+kind = "regex"
+score = 5
+model = "all"
+patterns = ['\b(?:no|any) other\b(?=[.,;:!?)])', '\bthe (?:former|latter)\b(?=[.,;:!?)]|\s+(?:is|was|are|were|has|does)\b)']
+
+[[rule]]
+id = "bare-it-object"
+name = "Bare 'it' as object of a code verb"
+kind = "regex"
+score = 1
+model = "all"
+patterns = ['\b(?:deciding|reading|calling|setting|passing|returning|parsing|rejecting|accepting|handling|wrapping|visiting) it\b(?![a-z])']
+
+[[rule]]
+id = "redundant-each"
+name = "Redundant distributive 'each'"
+kind = "regex"
+score = 5
+model = "claude"
+patterns = ['\b[A-Za-z]{3,}s (?:and [a-z]{3,}s )?each (?!other\b|of\b|time\b|day\b|year\b|week\b|month\b|night\b|morning\b|season\b)[a-z]{3,}\b']
+
+[[rule]]
+id = "whose-property"
+name = "'whose' clause for a simple property"
+kind = "regex"
+score = 5
+model = "claude"
+patterns = ['\bwhose [a-z]+ (?:has|have|had) (?:gone|become|grown|turned|fallen)\b', '\bwhose [a-z]+ (?:is|are|was|were) (?:stale|empty|missing|unset|null|expired)\b']
+
+[[rule]]
+id = "tree-noun"
+name = "Invented tree nouns ('vendored tree', 'base tree')"
+kind = "regex"
+score = 10
+model = "claude"
+patterns = ['\b(?:vendored|base|patched|upstream|pristine|reference|fixed|clean) tree\b']
+
+# ---------- F. Metaphor and verbs ----------
+
+[[rule]]
+id = "emphatic-own"
+name = "Emphatic 'X's own'"
+kind = "regex"
+score = 15
+model = "claude"
+patterns = ["\\b(?!let)[A-Za-z]+[’']s own\\b"]
+
+# dropped 2026-10-19 ("their own" is everyday English): emphatic-own-pronoun
+
+[[rule]]
+id = "its-own"
+name = "Emphatic 'its own'"
+kind = "regex"
+score = 5
+model = "claude"
+patterns = ['(?<!\bon )(?<!\bof )\bits own\b']
+
+[[rule]]
+id = "rulebook-words"
+name = "Rulebook vocabulary ('bare X', 'a tell')"
+kind = "regex"
+score = 10
+model = "claude"
+patterns = ['\bbare (?!minimum|hands?\b|feet\b|foot\b|bones?\b|chest\b|skin\b|walls?\b|necessities\b|essentials\b|arms?\b|legs?\b|shoulders?\b|trees?\b|ground\b|earth\b|floor\b|branches\b|room\b|bulb\b|light\b)[a-z]+', '\b(?:a|the) tell\b(?! (?:me|him|her|them|us|you)\b)']
+
+[[rule]]
+id = "pipeline-words"
+name = "Pipeline words in prose"
+kind = "phrase"
+model = "claude"
+[rule.phrases]
+"the gold" = 3
+"graded rows" = 3
+"hidden file" = 3
+"the suite" = 3
+
+[[rule]]
+id = "carry"
+name = "'carry' metaphor on code"
+kind = "regex"
+score = 4
+model = "claude"
+patterns = ['\b(?:flag|field|value|header|request|response|payload|token|column|key|option|parameter|argument|type|struct|record|row|entry|message|function|method|sentence|string|token)s? carr(?:y|ies|ied)\b']
+
+[[rule]]
+id = "vivid-verb"
+name = "Vivid verb on code"
+kind = "regex"
+score = 3
+model = "all"
+patterns = ['\bwent unexercised\b', '\bbuys? (?:nothing|little|us nothing)\b', '\b(?:the (?:check|rule|guard|test|alert|hook|handler)) fires\b', '\b(?:lands|surfaces) (?:in|as|on) the (?:log|output|response|cache|diff|report)\b']
+
+[[rule]]
+id = "body-verb"
+name = "Body verb on code"
+kind = "regex"
+score = 5
+model = "claude"
+patterns = ['\b(?:the )?(?:function|method|parser|module|patch|fix|test|check|guard|handler|request|value|flag|option|class|config|preset|library|code|rule|filter|limiter|cache|query) (?:gains|sits|walks|discards|stops at|lacks|looks at|learns|leaks|pins|touches|hands|travels|arrives)\b']
+
+[[rule]]
+id = "spatial-metaphor"
+name = "Spatial metaphor for logic"
+kind = "regex"
+score = 2
+model = "claude"
+patterns = ['\b(?:options?|flags?|features?|settings?|rules?|checks?) (?:behind|on top of|ahead of) (?:the|a|an)\b']
+
+[[rule]]
+id = "abstract-agent"
+name = "Abstract noun as agent ('the fix gives')"
+kind = "regex"
+score = 4
+model = "all"
+patterns = ['\b[Tt]he (?:obvious |simple |real |proposed |minimal )?(?:fix|patch|change|round|approach) (?:gives|makes|lets|keeps|turns|stops|forces|tells|teaches|buys)\b']
+
+# ---------- H. Human tells (negative evidence) ----------
+
+# dropped 2026-10-19 (no longer a human tell: current models use them as much): phrasal-verb
+
+
+# ---------- I. Read by an LLM (kind = "llm") ----------
+# One model call per segment, quotes verified against the text. Patterns that also fire on human text, or need the
+# source the text was written from, are left out.
+
+[[rule]]
+id = "llm-odd-idiom"
+name = "Odd technical idiom (LLM)"
+kind = "llm"
+score = 15
+model = "claude"
+pairs = "ai-idiom"
+ask = "A technical idiom people rarely use for a plain operation, e.g. 'gives back' for returns, 'hands back', 'reaches for'."
+
+[[rule]]
+id = "llm-elevated-synonym"
+name = "Elevated synonym (LLM)"
+kind = "llm"
+score = 2
+model = "all"
+pairs = "elevated-synonym"
+ask = "A thesaurus word where the plain one fits: commenced (started), ascertain (find out), elucidate (explain), utilize (use)."
+
+[[rule]]
+id = "llm-warmer-restatement"
+name = "Restatement in warmer words"
+kind = "llm"
+score = 3
+model = "all"
+ask = "A sentence that adds no new fact and restates the previous sentence more warmly or grandly."
+
+[[rule]]
+id = "llm-significance-closer"
+name = "Unsupported significance closer"
+kind = "llm"
+score = 5
+model = "chatgpt"
+ask = "A paragraph-final sentence asserting why something matters or what it shows, with nothing measured or specific behind it ('This highlights the importance of…')."
+
+[[rule]]
+id = "llm-canned-verdict"
+name = "Canned verdict sentence"
+kind = "llm"
+score = 5
+model = "all"
+ask = "A tidy stock verdict that closes a matter: 'The task is coherent again.', 'The issue is closed.', 'And that changes everything.' Includes 'closed' for handled/fixed/done."
+
+[[rule]]
+id = "llm-thought-order"
+name = "Facts glued on in thought order"
+kind = "llm"
+score = 5
+model = "all"
+ask = "Facts appended after the verb in the order they occurred to the writer, or a modifier split off into a glued clause, so the sentence must be re-read."
+
+[[rule]]
+id = "llm-epigram-opener"
+name = "Epigram / abstract forecast opener"
+kind = "llm"
+score = 10
+model = "all"
+ask = "A sentence opening a paragraph or section with an aphorism or abstract forecast instead of the subject: 'Under those hops sits one decision.', 'Every story has a turning point.'"
+
+[[rule]]
+id = "llm-dropped-that"
+name = "Dropped relative 'that' (garden path)"
+kind = "llm"
+score = 3
+model = "all"
+ask = "A relative 'that' dropped so the sentence misleads on first read: 'The tags GitHub filters pass through as live HTML.'"
+
+[[rule]]
+id = "llm-dropped-function-words"
+name = "Dropped function words"
+kind = "llm"
+score = 3
+model = "all"
+ask = "Articles or prepositions dropped in running prose, telegraph style: 'instead of all ancestors', 'pair different widths', 'means refresh'."
+
+[[rule]]
+id = "llm-unanchored-pronoun"
+name = "Unanchored pronoun or demonstrative (LLM)"
+kind = "llm"
+score = 10
+model = "claude"
+pairs = "unanchored-opener"
+ask = "A sentence or paragraph opening with a bare This/That/These/Those (no noun after it) or It/They, when the preceding text offers several candidates (a list, several clauses, a whole paragraph) so the reader must guess which one it points to: 'X, Y and Z changed. This means…' (this what?). Strict: flag it even if a reader can work it out. Not when one noun just before is the only candidate, or a noun follows ('This decision…')."
+
+[[rule]]
+id = "llm-uncounted-set"
+name = "Set counted, members never listed"
+kind = "llm"
+score = 5
+model = "all"
+ask = "A count or set referred to whose members the text never lists: 'the three steps', 'both concerns', 'these factors'."
+
+[[rule]]
+id = "llm-two-names"
+name = "One thing under two names"
+kind = "llm"
+score = 3
+model = "all"
+ask = "One thing called by two different names in the text (or two things by one), e.g. 'six options' later 'six constructs'. Quote the second name."
+
+[[rule]]
+id = "llm-pipeline-words"
+name = "Pipeline words in prose (LLM)"
+kind = "llm"
+score = 3
+model = "claude"
+pairs = "pipeline-words"
+ask = "Jargon from evaluation or build pipelines leaking into prose where it does not belong: gold, guards, rows, graded, the suite, harness."
+
+[[rule]]
+id = "llm-vivid-verb"
+name = "Vivid verb on a literal operation (LLM)"
+kind = "llm"
+score = 3
+model = "all"
+pairs = "vivid-verb"
+ask = "A dramatic verb for an ordinary operation of code, a system or a process: fires, lands, surfaces, drives, powers, unlocks, morphs."
+
+[[rule]]
+id = "llm-spatial-metaphor"
+name = "Spatial metaphor for logic (LLM)"
+kind = "llm"
+score = 2
+model = "claude"
+pairs = "spatial-metaphor"
+ask = "A spatial word for a logical relation: options 'behind' a preset, a feature 'on top of' another, 'left behind'."
+
+[[rule]]
+id = "llm-metaphor-by-meaning"
+name = "Figurative verb for a literal act"
+kind = "llm"
+score = 3
+model = "claude"
+ask = "A figurative verb for a literal act, making a thing an actor: a value 'is handed', a host 'comes back', a field 'carries' a zone, a policy 'breathes'."
+
+[[rule]]
+id = "llm-empty-shell"
+name = "Empty shell-noun sentence"
+kind = "llm"
+score = 4
+model = "all"
+ask = "A sentence built on a shell noun that says nothing on its own: 'Registration is where this gap opens.', 'That is the heart of the matter.'"
+
+[[rule]]
+id = "llm-explaining-away"
+name = "Explaining away a term choice"
+kind = "llm"
+score = 3
+model = "all"
+ask = "The writer keeps a word and justifies it in passing instead of choosing another ('to use the source's term', 'as the field calls it')."
+
+[[rule]]
+id = "llm-whose-property"
+name = "'whose' clause for a simple property (LLM)"
+kind = "llm"
+score = 5
+model = "claude"
+pairs = "whose-property"
+ask = "A 'whose' clause stating a simple property that an adjective or a 'with' phrase would say: 'a marker whose heartbeat has gone stale' (a marker with a stale heartbeat), 'a country whose economy is weak' (a weak economy). Not when the clause carries a real fact or event."
+
+[[rule]]
+id = "llm-redundant-each"
+name = "Redundant distributive 'each' (LLM)"
+kind = "llm"
+score = 5
+model = "claude"
+pairs = "redundant-each"
+ask = "'each' after a plural subject that already says every one does it: 'Readers and writers each leave a marker file.', 'The two reports each describe…'. Not when one-per-item is the fact ('they each paid $5', 'each of the three')."
