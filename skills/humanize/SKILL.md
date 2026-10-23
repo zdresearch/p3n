@@ -23,7 +23,7 @@ Each `rewrite` is one subagent called rewriter, on the cheapest model you have (
    - B: `Apply every rule strictly, rules 7 to 12 above all: no lead-in clauses, no contrast pairs, no trailing which/since clauses, no topic sentence. Paragraph: <Paragraph Text>`
    - C: `Rules 1, 3 and 4 above all: drop every general statement, concrete part first, short sentences. Paragraph: <Paragraph Text>`
 
-4. **Guard the facts.** If a `rewrite` has a number, or a capitalised word in mid sentence, that its paragraph does not have, ask that rewriter once more, adding "(Your last rewrite added X, which the paragraph does not contain. Do not.)". If it adds one again, keep the original paragraph.
+4. **Guard the facts.** Check each `rewrite` against its paragraph both ways. Added: a number, or a capitalised word in mid sentence, that the paragraph does not have. Dropped: a number, link or email address, quote (three words or more) or capitalised word in mid sentence that the paragraph has and the rewrite does not. A number counts as kept with a unit or suffix attached ("10min", "3x"), and a possessive is the same name. If either check fails, ask that rewriter once more, adding "(Your last rewrite added X and dropped Y. Keep every fact as written and add none.)", naming only what applies. If it fails again, keep the original paragraph.
 5. **Pick the best.** With three rewrites per paragraph (i.e., with the oracle), write each to a file and score them all in one call: `python3 scripts/oracle.py FILE1 FILE2 ...`. Keep the one with the lowest `ai`.
 6. **Put the text back together**, one paragraph for one paragraph, with the user's layout between them. If the oracle is available, score the original and the result: `python3 scripts/oracle.py BEFORE AFTER`.
 
