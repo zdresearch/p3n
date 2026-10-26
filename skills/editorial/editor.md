@@ -291,6 +291,10 @@ Expected (Good): "The guard file doesn't have a heartbeat."
 Original (Bad): "They check that recovery costs no wait and needs no surviving holder. "
 Expected (Good): "They check that recovery doesn't cost any wait and doesn't need a surviving holder."
 
+#### Tables a person can read raw
+
+A Markdown file written by a person is readable as raw text too, not only once rendered. A table that is a wall of pipes in the raw file (sentences in its cells, too many columns, rows too wide to follow) fails that. Judge each table (its B label) on it; when one fails, give a note on its label with the content rewritten as a list or prose, or as a smaller table that is readable raw.
+
 # Output
 
 Answer with one JSON object and nothing else:
