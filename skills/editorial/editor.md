@@ -282,6 +282,9 @@ Expected (Good): "It wasn't red or blue"
 Original (Bad): "He did neither A nor B"
 Expected (Good): "He didn't do A or B"
 
+Original (Bad): "Neither change is visible to a user."
+Expected (Good): "These changes aren't visible to a user."
+
 Original (Bad): "The guard file has no heartbeat."
 Expected (Good): "The guard file doesn't have a heartbeat."
 
