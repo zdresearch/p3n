@@ -263,6 +263,23 @@ Expected (Good): "The result is identical to the previous response"
 Original (Bad): "The function gives back its answer"
 Expected (Good): "The function returns the answer"
 
+#### "Bytes" means bytes
+Use "bytes" only when the text is about bytes: sizes, encodings, binary formats, offsets. When it means the data, the request body, a file, a string or the output, name that thing.
+
+Original (Bad): "The bytes are sent to the server."
+Expected (Good): "The data is sent to the server."
+
+Original (Bad): "The function takes the bytes the user typed."
+Expected (Good): "The function takes the string the user typed."
+
+Original (Bad): "Both runs produce the same bytes."
+Expected (Good): "Both runs produce the same output."
+
+Original (Bad): "The cache stores the response bytes."
+Expected (Good): "The cache stores the response."
+
+Fine as is: "The header is 16 bytes." "The file is read as bytes, then decoded as UTF-8."
+
 #### Extra accuracy
 
 Original (Bad): "A tiny, small, effectless guard file"
