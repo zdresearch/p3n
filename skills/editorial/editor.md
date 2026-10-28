@@ -321,6 +321,56 @@ Expected (Good): "The step-over repair scored 0."
 
 Fine as is: "Build time measured at 4.2 s." "Expectation, recorded before the measurement." "Each was settled on a measurement."
 
+#### "Against" is for opposition
+"Against" stays for opposition, guarding and checking against a reference ("guards against a double charge", "checked against the allowed values"). Two numbers aren't in a contest: use "versus", "whereas", "compared with", or a more specific word. A test runs on a suite, a change is based on a copy, a result is graded on a set. "Read against" is checked against or compared with. "On" is the generic form; a context-specific word is better.
+
+Original (Bad): "Fisher one-sided on 0/6 against 5/6 is p = 0.002"
+Expected (Good): "Fisher one-sided on 0/6 versus 5/6 is p = 0.002"
+
+Original (Bad): "`tests-audit` is 168 lines against origin's 395"
+Expected (Good): "`tests-audit` is 168 lines versus origin's 395"
+
+Original (Bad): "The baseline is 349 words against the prompt's 364"
+Expected (Good): "The baseline is 349 words, and the prompt is 364"
+
+Original (Bad): "8 billed rows against 5"
+Expected (Good): "8 billed rows, compared with 5"
+
+Original (Bad): "The `.md` ran against the revised text"
+Expected (Good): "The `.md` ran on the revised text"
+
+Original (Bad): "Run against the newest oracle run log of every task"
+Expected (Good): "Run on the newest oracle run log of every task"
+
+Original (Bad): "The rollouts were replayed against the new suite."
+Expected (Good): "The rollouts were replayed on the new suite."
+
+Original (Bad): "90 loc of Protocol, TypeVar and overloads verified against mypy and pyright"
+Expected (Good): "90 loc of Protocol, TypeVar and overloads verified on mypy and pyright"
+
+Original (Bad): "Verified against the gold: `__invoke` resolves minWidth first"
+Expected (Good): "Matches the gold patch: `__invoke` resolves minWidth first"
+
+Original (Bad): "A hunt record checked against the outcome it predicted"
+Expected (Good): "A hunt record compared with the outcome it predicted"
+
+Original (Bad): "Four prompts that shipped, read against the rules"
+Expected (Good): "Four prompts that shipped, checked against the rules"
+
+Original (Bad): "Read against the file you parked, the codex pass took the default"
+Expected (Good): "Compared with the file you parked, the codex pass took the default"
+
+Original (Bad): "My append was written against a stale local copy"
+Expected (Good): "My append was based on a stale local copy"
+
+Original (Bad): "Every one of those rollouts scored against a smaller `pass_to_pass` set"
+Expected (Good): "Every one of those rollouts scored on a smaller `pass_to_pass` set"
+
+Original (Bad): "The suite it was graded against"
+Expected (Good): "The suite it was graded on"
+
+Fine as is: "The flag guards against a double charge." "Arguments are checked against the allowed values." "He voted against the bill."
+
 #### Extra accuracy
 
 Original (Bad): "A tiny, small, effectless guard file"
