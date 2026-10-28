@@ -280,6 +280,47 @@ Expected (Good): "The cache stores the response."
 
 Fine as is: "The header is 16 bytes." "The file is read as bytes, then decoded as UTF-8."
 
+#### "Measured" means a measurement
+Use "measure" only for a number with a unit or a result of an empirical run, written in the sentence. Otherwise it was checked or tested, and a comparison is "compared with". Drop the "not assumed/argued/asserted/guessed" tail, and cut "Measured here:" labels: the evidence speaks for itself.
+
+Original (Bad): "That is measured rather than assumed."
+Expected (Good): "That was tested."
+
+Original (Bad): "Each step below was measured rather than argued."
+Expected (Good): "Each step below was tested."
+
+Original (Bad): "Difficulty is measured, not asserted."
+Expected (Good): "Difficulty is checked."
+
+Original (Bad): "Build cost, measured, not guessed."
+Expected (Good): "Build cost, checked."
+
+Original (Bad): "It settles it by measurement rather than argument."
+Expected (Good): "It is settled by a test."
+
+Original (Bad): "Cause 1 is measured on HEAD."
+Expected (Good): "Cause 1 was checked on HEAD."
+
+Original (Bad): "The `--confcutdir` option and the guards were measured on pytest 9."
+Expected (Good): "The `--confcutdir` option and the guards were tested on pytest 9."
+
+Original (Bad): "Measured against five jars from Maven Central."
+Expected (Good): "Checked on five jars from Maven Central."
+
+Original (Bad): "The agents' source change measured against the restored fixture"
+Expected (Good): "The agents' source change compared with the restored fixture"
+
+Original (Bad): "Measured against what the prompt already gives away"
+Expected (Good): "Compared with what the prompt already gives away"
+
+Original (Bad): "Measured rather than argued: the report carries the stamp c7a2d79b."
+Expected (Good): "The report carries the stamp c7a2d79b."
+
+Original (Bad): "**Measured here:** the step-over repair that scored 0"
+Expected (Good): "The step-over repair scored 0."
+
+Fine as is: "Build time measured at 4.2 s." "Expectation, recorded before the measurement." "Each was settled on a measurement."
+
 #### Extra accuracy
 
 Original (Bad): "A tiny, small, effectless guard file"
