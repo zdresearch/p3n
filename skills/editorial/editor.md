@@ -388,6 +388,36 @@ Expected (Good): "Upgrading can lose data."
 
 Fine as is: "The truck carries 20 tons." "We carried out the migration on Tuesday."
 
+#### "Untouched", "either way", "as written", "verbatim"
+
+These words are sometimes right, but they often stand in for a plainer, exact word. Keep one where it says something the plain word doesn't. Otherwise use the plain word, or name what it refers to: the change, the two cases, the reading.
+
+Original (Bad): "`pyproject.toml` and `setup.cfg` are untouched."
+Expected (Good): "`pyproject.toml` and `setup.cfg` are not modified." (or "are unmodified")
+
+Original (Bad): "`cs` is untouched by the PR."
+Expected (Good): "The PR doesn't change `cs`."
+
+Original (Bad): "The graded side was left untouched, so that claim holds."
+Expected (Good): "The claim holds because nothing on the graded side changed."
+
+Original (Bad): "So all twelve are red either way."
+Expected (Good): "So all twelve are red with or without the patch."
+
+Original (Bad): "Recorded here either way so a later pass does not redo it."
+Expected (Good): "Recorded here so a later pass does not redo it."
+
+Original (Bad): "Verifying claim 1 showed that is false as written."
+Expected (Good): "Verifying claim 1 showed its wording is wrong."
+
+Original (Bad): "Every PASS_TO_PASS test ID listed verbatim in tests/config.json"
+Expected (Good): "Every PASS_TO_PASS test ID, listed in tests/config.json"
+
+Original (Bad): "That is family B verbatim."
+Expected (Good): "That is identical to family B."
+
+Fine as is: "| `374423ea…` | untouched |", "The owner's order, verbatim: '…'", "A solver could copy it verbatim.", "The rule does not apply as written: the scrubber replaces the bare literal."
+
 #### Extra accuracy
 
 Original (Bad): "A tiny, small, effectless guard file"
