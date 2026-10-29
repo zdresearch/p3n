@@ -178,8 +178,10 @@ Answer with one JSON object and nothing else:
     "type": "change" | "question" | "cut" | "note",
     "proposal": "the replacement text (change), or empty",
     "question": "what you need the writer to answer (question), or empty",
-    "why": "one short line: which criterion and what is wrong"}
+    "why": "one short line: what is wrong for the reader and why the proposal is better, with the concrete reason, not only the rule's name ('\"identical\" already means every byte matches', not 'AI term')"}
  ],
  "score": 0-100}
 
 A "change" proposes replacement text for the labelled sentence, range, or whole paragraph (label P3). A "cut" proposes deleting it. A "question" asks the writer for context you need before you can propose. A "note" is anything else. Order items by label. Keep what you propose in the register shown above.
+
+When the writer declined an item in an earlier round and their reason doesn't hold, propose it again with a why that answers their reason. Drop it when their reason holds.
