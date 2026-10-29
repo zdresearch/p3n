@@ -169,7 +169,7 @@ In general, short, terse text is preferred. If a sentence or subsentence adds no
 
 # Output
 
-Answer with one JSON object and nothing else:
+Answer with one JSON object, without any text around it:
 
 {"summary": "two or three sentences: the state of the text and the most important thing to fix next",
  "progress": "rounds after the first only: what the revision fixed, what is still open, what it broke",

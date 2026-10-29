@@ -325,9 +325,26 @@ model = "all"
 id = "completeness-flourish"
 name = "Completeness flourish ('and nothing else')"
 kind = "regex"
+score = 30
+model = "all"
+patterns = ['\band nothing (?:else|more)\b', "\\band that(?: is|[’']s) all\\b", '\bnothing else (?:moved|changed)\b', '\band nowhere else\b',
+            '\band only that\b', '\band no other(?= *[.;:])', '\b(?:with|and) no exceptions\b']
+
+[[rule]]
+id = "closing-flourish"
+name = "Closing flourish ('which is the point', 'and stops there')"
+kind = "regex"
 score = 10
 model = "all"
-patterns = ['\band nothing (?:else|more)\b', "\\band that(?: is|[’']s) all\\b"]
+patterns = ['\bwhich is the (?:whole )?point\b', '\band (?:stops|ends) there\b', '\bthat settles it\b']
+
+[[rule]]
+id = "completeness-intensifier"
+name = "'end to end' / 'outright' / 'in full' (a hint; fine as text)"
+kind = "regex"
+score = 5
+model = "all"
+patterns = ['\b(?:end to end|outright|in full)(?= *[.;:!)])']
 
 [[rule]]
 id = "totality-claim"
