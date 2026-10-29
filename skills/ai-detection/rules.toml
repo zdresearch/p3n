@@ -565,11 +565,11 @@ model = "claude"
 
 [[rule]]
 id = "carry"
-name = "'carry' metaphor on code"
+name = "'carry' (means haul)"
 kind = "regex"
-score = 4
+score = 10
 model = "claude"
-patterns = ['\b(?:flag|field|value|header|request|response|payload|token|column|key|option|parameter|argument|type|struct|record|row|entry|message|function|method|sentence|string|token)s? carr(?:y|ies|ied)\b']
+patterns = ['\bcarr(?:y|ies|ied|ying)\b(?! out\b)']
 
 [[rule]]
 id = "vivid-verb"
