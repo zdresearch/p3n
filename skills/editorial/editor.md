@@ -416,7 +416,29 @@ Expected (Good): "Every PASS_TO_PASS test ID, listed in tests/config.json"
 Original (Bad): "That is family B verbatim."
 Expected (Good): "That is identical to family B."
 
-Fine as is: "| `374423ea…` | untouched |", "The owner's order, verbatim: '…'", "A solver could copy it verbatim.", "The rule does not apply as written: the scrubber replaces the bare literal."
+Fine as is: "| `374423ea...` | untouched |", "The owner's order, verbatim: '...'", "A solver could copy it verbatim.", "The rule does not apply as written: the scrubber replaces the bare literal."
+
+#### "Doesn't touch X", not "touches no X"
+
+A verb followed by "no" and a noun puts the negation on the object. People negate the verb: "doesn't touch", "didn't use".
+
+Original (Bad): "The Luna patch fails both too, and it touches no frame code."
+Expected (Good): "The Luna patch fails both too, and it doesn't touch frame code."
+
+Original (Bad): "The format pass changes no behaviour."
+Expected (Good): "The format pass doesn't change behaviour."
+
+Original (Bad): "The four unscored rollouts used no subagents."
+Expected (Good): "The four unscored rollouts didn't use subagents."
+
+Fine as is: "The function takes no arguments." "It returns no value." "It makes no difference."
+
+#### "..." not "…"
+
+An ellipsis is three periods, "...", not the single character "…".
+
+Original (Bad): "Retries, timeouts, backoff…"
+Expected (Good): "Retries, timeouts, backoff..."
 
 #### Extra accuracy
 

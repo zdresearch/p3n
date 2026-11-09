@@ -581,6 +581,14 @@ model = "claude"
 "the suite" = 3
 
 [[rule]]
+id = "verb-no-noun"
+name = "'touches no X' for 'doesn't touch X'"
+kind = "regex"
+score = 20
+model = "claude"
+patterns = ['\b(?:touch|change|modif(?:y|ie)|edit|read|write|call|import|add|send|run|open|check|test|fire|hit|use|load|emit|print|fetch|need|get|match|reach|raise|throw)(?:s|es|ed|d)? no\b(?! (?:longer|more|less|matter|sense|doubt|difference|way|one)\b)']
+
+[[rule]]
 id = "carry"
 name = "'carry' (means haul)"
 kind = "regex"
